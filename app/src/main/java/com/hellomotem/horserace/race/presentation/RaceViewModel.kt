@@ -25,7 +25,7 @@ class RaceViewModel @Inject constructor(
                 Log.d("TAG", "State was collected with $time")
                 updateState { state ->
                     state.copy(
-                        time = RaceTimeUi(time.hours, time.minutes, time.seconds, time.millis)
+                        time = RaceTimeUi.create(time.value)
                     )
                 }
             }
@@ -58,7 +58,7 @@ class RaceViewModel @Inject constructor(
     }
 
     data class State(
-        val time: RaceTimeUi = RaceTimeUi.empty,
+        val time: RaceTimeUi = RaceTimeUi.ZERO,
         val isRaceInProgress: Boolean = false
     )
 
