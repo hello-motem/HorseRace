@@ -56,6 +56,7 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
 
     private fun setupState(state: RaceViewModel.State) {
         binding.timerTextview.text = state.time.formatted()
-        binding.restartButton.isEnabled = state.time != RaceTimeUi.empty
+        binding.restartButton.isEnabled = state.time != RaceTimeUi.ZERO
+        binding.startButton.isEnabled = state.time == RaceTimeUi.ZERO
     }
 }
