@@ -11,20 +11,48 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/race_history_date"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            tools:text="Дата скачек: 17.07.2025, 15:47:56"
+            android:id="@+id/race_history_date_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            android:text="@string/race_date_title_text"
+            />
+
+        <TextView
+            android:id="@+id/race_history_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="17.07.2025, 15:47:56"
+            android:layout_marginTop="@dimen/padding_s"
+            app:layout_constraintTop_toBottomOf="@id/race_history_date_title"
+            app:layout_constraintStart_toStartOf="@id/race_history_date_title"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/race_history_time_title"
+            app:layout_constraintStart_toStartOf="@id/race_history_date"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/race_time_title_text"
+            app:layout_constraintTop_toBottomOf="@id/race_history_date"
+            android:layout_marginTop="@dimen/padding_s"
+            android:textSize="18sp"
+            android:textStyle="bold"
             />
 
         <TextView
             android:id="@+id/race_history_time"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            tools:text="Время первой лошади: 0 часов 17 минут 28 секунд 346 миллисекунд"
-            app:layout_constraintTop_toBottomOf="@id/race_history_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_s"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="0 часов 17 минут 28 секунд 346 миллисекунд"
+            app:layout_constraintTop_toBottomOf="@id/race_history_time_title"
             app:layout_constraintStart_toStartOf="parent"
             />
 

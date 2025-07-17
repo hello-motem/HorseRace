@@ -12,6 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.hellomotem.horserace.R
 import com.hellomotem.horserace.databinding.FragmentRaceScreenBinding
 import com.hellomotem.horserace.delegates.stringRes
+import com.hellomotem.horserace.race.presentation.models.RaceTimeUi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

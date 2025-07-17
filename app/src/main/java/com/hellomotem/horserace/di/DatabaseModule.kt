@@ -1,4 +1,4 @@
-package com.hellomotem.horserace
+package com.hellomotem.horserace.di
 
 import android.content.Context
 import androidx.room.Room

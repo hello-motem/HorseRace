@@ -6,6 +6,9 @@
     <string name="delete_button_text">Удалить</string>
     <string name="save_button_text">Сохранить</string>
     <string name="already_saved_button_text">Гонка уже сохранена</string>
+
+    <string name="race_date_title_text">Дата забега</string>
+    <string name="race_time_title_text">Время первой лошади</string>
     <string name="empty_history_list_placeholder_text">У вас пока нет сохраненных гонок</string>
 
     <string-array name="tabs_array">

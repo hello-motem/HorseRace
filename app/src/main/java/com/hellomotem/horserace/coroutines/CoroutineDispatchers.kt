@@ -1,4 +1,4 @@
-package com.hellomotem.horserace
+package com.hellomotem.horserace.coroutines
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
