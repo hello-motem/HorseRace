@@ -38,7 +38,7 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
         timerJob = tickerFlow(1.milliseconds)
             .onStart { startDate = Instant.now() }
             .map { java.time.Duration.between(startDate, Instant.now()) }
-            .map { Timer.State(it.toKotlinDuration()) }
+            .map { duration -> Timer.State(duration.toKotlinDuration()) }
             .onEach { timerState -> _timerState.update { timerState } }
             .launchIn(scope)
 
