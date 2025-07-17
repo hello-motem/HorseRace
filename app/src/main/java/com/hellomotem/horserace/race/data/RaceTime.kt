@@ -1,6 +1,5 @@
 package com.hellomotem.horserace.race.data
 
-import com.hellomotem.horserace.timer.Timer
 import kotlin.time.Duration
 
 @JvmInline
@@ -11,5 +10,3 @@ value class RaceTime private constructor(val value: Duration) {
         val ZERO = RaceTime(Duration.ZERO)
     }
 }
-
-fun Timer.State.toRaceTime(): RaceTime = RaceTime.create(value)

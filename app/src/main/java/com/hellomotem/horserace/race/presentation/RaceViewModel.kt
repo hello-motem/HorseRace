@@ -2,7 +2,11 @@ package com.hellomotem.horserace.race.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hellomotem.horserace.race.data.RaceRepository
+import com.hellomotem.horserace.history.data.model.RaceHistoryModel
+import com.hellomotem.horserace.history.data.repository.RaceHistoryRepository
+import com.hellomotem.horserace.race.data.repository.RaceRepository
+import com.hellomotem.horserace.race.presentation.formatter.DateFormatter
+import com.hellomotem.horserace.race.presentation.models.RaceTimeUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +16,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RaceViewModel @Inject constructor(
-    private val raceRepository: RaceRepository
+    private val raceRepository: RaceRepository,
+    private val historyRepository: RaceHistoryRepository,
+    private val formatter: DateFormatter
 ): ViewModel() {
 
     private val _state = MutableStateFlow(State())
@@ -29,42 +35,60 @@ class RaceViewModel @Inject constructor(
     }
 
     fun dispatchEvent(event: Event) {
-        when (event) {
-            Event.OnRestartClicked -> {
-                viewModelScope.launch {
-                    _state.update { state ->
+        viewModelScope.launch {
+            when (event) {
+                Event.OnRestartClicked -> onRestartClicked()
 
-                        raceRepository.resetRace()
-                        state.copy(raceState = State.RaceState.INITIAL)
-                    }
-                }
-            }
+                Event.OnStartClicked -> onStartClicked()
 
-            Event.OnStartClicked -> {
-                viewModelScope.launch {
-                    _state.update { state ->
-                        state.copy(
-                            raceState = when (state.raceState) {
-                                State.RaceState.INITIAL -> {
-                                    raceRepository.startRace()
-                                    State.RaceState.STARTED
-                                }
-                                State.RaceState.STARTED -> {
-                                    raceRepository.endRace()
-                                    State.RaceState.STOPPED
-                                }
-                                State.RaceState.STOPPED -> State.RaceState.STOPPED
-                            }
-                        )
-                    }
-                }
+                Event.OnSaveClicked -> onSaveClicked()
             }
         }
     }
 
+    private suspend fun onRestartClicked(): Unit = _state.update { state ->
+        raceRepository.resetRace()
+
+        state.copy(
+            raceState = State.RaceState.INITIAL,
+            isItemSaved = false
+        )
+    }
+
+    private suspend fun onStartClicked(): Unit = _state.update { state ->
+        state.copy(
+            raceState = when (state.raceState) {
+                State.RaceState.INITIAL -> {
+                    raceRepository.startRace()
+                    State.RaceState.STARTED
+                }
+
+                State.RaceState.STARTED -> {
+                    raceRepository.endRace()
+                    State.RaceState.STOPPED
+                }
+
+                State.RaceState.STOPPED -> State.RaceState.STOPPED
+            }
+        )
+    }
+
+    private suspend fun onSaveClicked(): Unit = _state.update { state ->
+        val startDate = raceRepository.getStartDate().toUi()
+
+        val model = RaceHistoryModel(
+            dateOfRace = startDate.formatted(formatter),
+            raceTime = state.time.formatted()
+        )
+
+        historyRepository.saveRace(model)
+        state.copy(isItemSaved = true)
+    }
+
     data class State(
         val time: RaceTimeUi = RaceTimeUi.ZERO,
-        val raceState: RaceState = RaceState.INITIAL
+        val raceState: RaceState = RaceState.INITIAL,
+        val isItemSaved: Boolean = false
     ) {
         enum class RaceState { INITIAL, STARTED, STOPPED }
     }
@@ -72,5 +96,6 @@ class RaceViewModel @Inject constructor(
     sealed interface Event {
         data object OnStartClicked: Event
         data object OnRestartClicked: Event
+        data object OnSaveClicked: Event
     }
 }

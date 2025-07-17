@@ -1,16 +1,11 @@
 package com.hellomotem.horserace.timer
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import com.hellomotem.horserace.CoroutineDispatchers
+import com.hellomotem.horserace.coroutines.CoroutineDispatchers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -18,12 +13,11 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import java.time.Instant
 import javax.inject.Inject
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.toKotlinDuration
 
 class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
-    private var startDate: Instant? = null
+    private lateinit var startDate: Instant
 
     private val scope: CoroutineScope = CoroutineScope(dispatchers.default)
     private var timerJob: Job? = null
@@ -31,7 +25,6 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
     private val _timerState = MutableStateFlow(Timer.State.ZERO)
     override val timerState: StateFlow<Timer.State> = _timerState.asStateFlow()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun start() {
         timerJob?.cancel()
 
@@ -41,8 +34,6 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
             .map { duration -> Timer.State(duration.toKotlinDuration()) }
             .onEach { timerState -> _timerState.update { timerState } }
             .launchIn(scope)
-
-        timerJob?.start()
     }
 
     override fun stop() {
@@ -54,10 +45,6 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
         _timerState.update { Timer.State.ZERO }
     }
 
-    private fun tickerFlow(period: Duration): Flow<Unit> = flow {
-        while (true) {
-            emit(Unit)
-            delay(period)
-        }
-    }
+    override fun getStartDate(): Timer.StartDate = Timer.StartDate(startDate)
 }
+

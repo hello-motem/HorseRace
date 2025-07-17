@@ -1,6 +1,9 @@
-package com.hellomotem.horserace.race.data
+package com.hellomotem.horserace.race.data.repository
 
-import com.hellomotem.horserace.CoroutineDispatchers
+import com.hellomotem.horserace.coroutines.CoroutineDispatchers
+import com.hellomotem.horserace.race.data.RaceStartDate
+import com.hellomotem.horserace.race.data.RaceTime
+import com.hellomotem.horserace.race.data.toRaceTime
 import com.hellomotem.horserace.timer.Timer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,5 +31,10 @@ class RaceRepositoryImpl @Inject constructor(
 
     override suspend fun resetRace() {
         timer.stopAndReset()
+    }
+
+    override suspend fun getStartDate(): RaceStartDate {
+        val timerStartDate = timer.getStartDate()
+        return RaceStartDate(timerStartDate.value)
     }
 }

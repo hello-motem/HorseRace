@@ -8,15 +8,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.tabs.TabLayoutMediator
 import com.hellomotem.horserace.R
 import com.hellomotem.horserace.databinding.ActivityMainBinding
+import com.hellomotem.horserace.delegates.stringArray
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
-    private val tabs by lazy(LazyThreadSafetyMode.NONE) {
-        resources.getStringArray(R.array.tabs_array)
-    }
+    private val tabs by stringArray(R.array.tabs_array)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

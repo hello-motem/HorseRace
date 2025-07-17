@@ -1,4 +1,4 @@
-package com.hellomotem.horserace.race.presentation
+package com.hellomotem.horserace.race.presentation.models
 
 import kotlin.time.Duration
 

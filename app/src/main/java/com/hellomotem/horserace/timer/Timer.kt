@@ -1,6 +1,7 @@
 package com.hellomotem.horserace.timer
 
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 import kotlin.time.Duration
 
 interface Timer {
@@ -12,6 +13,8 @@ interface Timer {
 
     fun stopAndReset()
 
+    fun getStartDate(): StartDate
+
     @JvmInline
     value class State(val value: Duration) {
 
@@ -19,4 +22,7 @@ interface Timer {
             val ZERO = State(Duration.ZERO)
         }
     }
+
+    @JvmInline
+    value class StartDate(val value: Instant)
 }

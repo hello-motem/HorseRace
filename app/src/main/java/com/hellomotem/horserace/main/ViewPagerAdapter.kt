@@ -3,6 +3,7 @@ package com.hellomotem.horserace.main
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.hellomotem.horserace.history.presentation.RaceHistoryFragment
 import com.hellomotem.horserace.race.presentation.RaceFragment
 
 class ViewPagerAdapter(activity: AppCompatActivity): FragmentStateAdapter(activity) {
@@ -11,7 +12,7 @@ class ViewPagerAdapter(activity: AppCompatActivity): FragmentStateAdapter(activi
     override fun createFragment(position: Int): Fragment {
         return when(position) {
             0 -> RaceFragment()
-            1 -> RaceFragment()
+            1 -> RaceHistoryFragment()
             else -> error("Unknown position $position")
         }
     }
