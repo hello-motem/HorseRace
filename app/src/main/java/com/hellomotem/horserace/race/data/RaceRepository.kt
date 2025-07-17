@@ -11,4 +11,6 @@ interface RaceRepository {
     suspend fun endRace()
 
     suspend fun resetRace()
+
+    suspend fun getStartDate(): RaceStartDate?
 }

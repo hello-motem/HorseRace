@@ -25,6 +25,8 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
 
     private val stopButtonText by stringRes(R.string.stop_button_text)
     private val startButtonText by stringRes(R.string.start_button_text)
+    private val saveButtonText by stringRes(R.string.save_button_text)
+    private val alreadySavedButtonText by stringRes(R.string.already_saved_button_text)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,6 +46,10 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
 
         binding.restartButton.setOnClickListener {
             viewModel.dispatchEvent(RaceViewModel.Event.OnRestartClicked)
+        }
+
+        binding.saveButton.setOnClickListener {
+            viewModel.dispatchEvent(RaceViewModel.Event.OnSaveClicked)
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -66,10 +72,16 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
             RaceViewModel.State.RaceState.STOPPED -> startButtonText
         }
         restartButton.isEnabled = state.time != RaceTimeUi.ZERO
-        startButton.isEnabled = when(state.raceState) {
+        startButton.isEnabled = when (state.raceState) {
             RaceViewModel.State.RaceState.INITIAL -> true
             RaceViewModel.State.RaceState.STARTED -> true
             RaceViewModel.State.RaceState.STOPPED -> false
+        }
+        saveButton.isEnabled =
+            state.raceState == RaceViewModel.State.RaceState.STOPPED && !state.isItemSaved
+        saveButton.text = when(state.isItemSaved) {
+            true -> alreadySavedButtonText
+            false -> saveButtonText
         }
     }
 }

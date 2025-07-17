@@ -13,7 +13,7 @@ interface RaceHistoryDao {
     fun getAllRaceHistory(): Flow<List<RaceHistoryEntity>>
 
     @Query("DELETE FROM race_history WHERE id = :id")
-    suspend fun deleteRaceHistoryEntity(id: String)
+    suspend fun deleteRaceHistoryEntity(id: Long)
 
     @Insert
     suspend fun saveRaceHistoryEntity(raceHistoryEntity: RaceHistoryEntity)

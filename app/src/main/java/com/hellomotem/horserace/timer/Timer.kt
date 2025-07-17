@@ -12,6 +12,8 @@ interface Timer {
 
     fun stopAndReset()
 
+    fun getStartDate(): StartDate
+
     @JvmInline
     value class State(val value: Duration) {
 
@@ -19,4 +21,7 @@ interface Timer {
             val ZERO = State(Duration.ZERO)
         }
     }
+
+    @JvmInline
+    value class StartDate(val value: String)
 }

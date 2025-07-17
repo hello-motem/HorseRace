@@ -9,5 +9,5 @@ interface LocalDataSource {
 
     suspend fun saveRaceHistoryEntity(raceHistoryEntity: RaceHistoryEntity)
 
-    suspend fun deleteRaceHistoryEntity(id: String)
+    suspend fun deleteRaceHistoryEntity(id: Long)
 }

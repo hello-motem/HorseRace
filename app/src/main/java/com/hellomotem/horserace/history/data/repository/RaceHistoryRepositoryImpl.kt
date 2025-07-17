@@ -19,7 +19,7 @@ class RaceHistoryRepositoryImpl @Inject constructor(
         localDataSource.saveRaceHistoryEntity(raceHistoryModel.toEntity())
     }
 
-    override suspend fun deleteRaceHistoryItem(id: String) {
+    override suspend fun deleteRaceHistoryItem(id: Long) {
         localDataSource.deleteRaceHistoryEntity(id)
     }
 }

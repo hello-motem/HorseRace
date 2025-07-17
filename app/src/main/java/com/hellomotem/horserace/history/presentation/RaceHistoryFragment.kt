@@ -4,11 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import com.hellomotem.horserace.R
 import com.hellomotem.horserace.databinding.FragmentRaceHistoryScreenBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,7 +32,6 @@ class RaceHistoryFragment: Fragment(R.layout.fragment_race_history_screen) {
         )
     }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,7 +43,7 @@ class RaceHistoryFragment: Fragment(R.layout.fragment_race_history_screen) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.raceHistoryRecyclerView.adapter = adapter
+        setupRecyclerView()
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -55,7 +58,20 @@ class RaceHistoryFragment: Fragment(R.layout.fragment_race_history_screen) {
         _binding = null
     }
 
+    private fun setupRecyclerView() {
+        binding.raceHistoryRecyclerView.adapter = adapter
+
+        val divider = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
+        val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.race_history_item_divider)
+        drawable?.let(divider::setDrawable)
+
+        binding.raceHistoryRecyclerView.addItemDecoration(divider)
+    }
+
     private fun setupState(state: RacesHistoryViewModel.State) {
         adapter.items = state.items
+
+        binding.raceHistoryRecyclerView.isVisible = state.items.isNotEmpty()
+        binding.emptyListPlaceholder.isVisible = state.items.isEmpty()
     }
 }

@@ -9,5 +9,5 @@ interface RaceHistoryRepository {
 
     suspend fun saveRace(raceHistoryModel: RaceHistoryModel)
 
-    suspend fun deleteRaceHistoryItem(id: String)
+    suspend fun deleteRaceHistoryItem(id: Long)
 }

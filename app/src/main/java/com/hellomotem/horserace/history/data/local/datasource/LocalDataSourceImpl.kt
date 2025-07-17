@@ -13,6 +13,6 @@ class LocalDataSourceImpl @Inject constructor(
     override suspend fun saveRaceHistoryEntity(raceHistoryEntity: RaceHistoryEntity) = dao
         .saveRaceHistoryEntity(raceHistoryEntity)
 
-    override suspend fun deleteRaceHistoryEntity(id: String) = dao
+    override suspend fun deleteRaceHistoryEntity(id: Long) = dao
         .deleteRaceHistoryEntity(id)
 }

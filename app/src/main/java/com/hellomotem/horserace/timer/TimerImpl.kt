@@ -41,8 +41,6 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
             .map { duration -> Timer.State(duration.toKotlinDuration()) }
             .onEach { timerState -> _timerState.update { timerState } }
             .launchIn(scope)
-
-        timerJob?.start()
     }
 
     override fun stop() {
@@ -52,6 +50,11 @@ class TimerImpl @Inject constructor(dispatchers: CoroutineDispatchers): Timer {
     override fun stopAndReset() {
         timerJob?.cancel()
         _timerState.update { Timer.State.ZERO }
+    }
+
+    override fun getStartDate(): Timer.StartDate {
+        val startDate = requireNotNull(startDate)
+        return Timer.StartDate(startDate.toString())
     }
 
     private fun tickerFlow(period: Duration): Flow<Unit> = flow {

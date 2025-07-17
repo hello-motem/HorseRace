@@ -5,7 +5,7 @@ import com.hellomotem.horserace.history.data.model.RaceHistoryModel
 fun List<RaceHistoryEntity>.toModel(): List<RaceHistoryModel> = map { it.toModel() }
 
 fun RaceHistoryEntity.toModel(): RaceHistoryModel = RaceHistoryModel(
-    id = id.toString(),
+    id = id,
     dateOfRace = dateOfRace,
     raceTime = raceTime
 )
