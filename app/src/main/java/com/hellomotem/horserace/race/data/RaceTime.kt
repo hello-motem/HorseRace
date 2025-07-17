@@ -12,6 +12,4 @@ value class RaceTime private constructor(val value: Duration) {
     }
 }
 
-fun Timer.State.toRaceTime(): RaceTime = RaceTime.create(
-    value
-)
+fun Timer.State.toRaceTime(): RaceTime = RaceTime.create(value)

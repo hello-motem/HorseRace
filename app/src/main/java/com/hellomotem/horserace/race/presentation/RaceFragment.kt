@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.hellomotem.horserace.R
 import com.hellomotem.horserace.databinding.FragmentRaceScreenBinding
+import com.hellomotem.horserace.delegates.stringRes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -21,6 +22,9 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
 
     private var _binding: FragmentRaceScreenBinding? = null
     private val binding: FragmentRaceScreenBinding get() = requireNotNull(_binding)
+
+    private val stopButtonText by stringRes(R.string.stop_button_text)
+    private val startButtonText by stringRes(R.string.start_button_text)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,9 +58,18 @@ class RaceFragment: Fragment(R.layout.fragment_race_screen) {
         _binding = null
     }
 
-    private fun setupState(state: RaceViewModel.State) {
-        binding.timerTextview.text = state.time.formatted()
-        binding.restartButton.isEnabled = state.time != RaceTimeUi.ZERO
-        binding.startButton.isEnabled = state.time == RaceTimeUi.ZERO
+    private fun setupState(state: RaceViewModel.State): Unit = with(binding) {
+        timerTextview.text = state.time.formatted()
+        startButton.text = when(state.raceState) {
+            RaceViewModel.State.RaceState.INITIAL -> startButtonText
+            RaceViewModel.State.RaceState.STARTED -> stopButtonText
+            RaceViewModel.State.RaceState.STOPPED -> startButtonText
+        }
+        restartButton.isEnabled = state.time != RaceTimeUi.ZERO
+        startButton.isEnabled = when(state.raceState) {
+            RaceViewModel.State.RaceState.INITIAL -> true
+            RaceViewModel.State.RaceState.STARTED -> true
+            RaceViewModel.State.RaceState.STOPPED -> false
+        }
     }
 }

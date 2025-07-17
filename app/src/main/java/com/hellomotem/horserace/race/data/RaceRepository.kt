@@ -9,4 +9,6 @@ interface RaceRepository {
     suspend fun startRace()
 
     suspend fun endRace()
+
+    suspend fun resetRace()
 }

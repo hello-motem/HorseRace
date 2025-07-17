@@ -1,6 +1,5 @@
 package com.hellomotem.horserace.race.presentation
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellomotem.horserace.race.data.RaceRepository
@@ -22,11 +21,8 @@ class RaceViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             raceRepository.raceTime.collect { time ->
-                Log.d("TAG", "State was collected with $time")
-                updateState { state ->
-                    state.copy(
-                        time = RaceTimeUi.create(time.value)
-                    )
+                _state.update { state ->
+                    state.copy(time = RaceTimeUi.create(time.value))
                 }
             }
         }
@@ -35,32 +31,43 @@ class RaceViewModel @Inject constructor(
     fun dispatchEvent(event: Event) {
         when (event) {
             Event.OnRestartClicked -> {
-                updateState { currentState ->
-                    currentState.copy(
-//                        time = 0,
-                        isRaceInProgress = false
-                    )
+                viewModelScope.launch {
+                    _state.update { state ->
+
+                        raceRepository.resetRace()
+                        state.copy(raceState = State.RaceState.INITIAL)
+                    }
                 }
             }
 
             Event.OnStartClicked -> {
-                viewModelScope.launch { raceRepository.startRace() }
+                viewModelScope.launch {
+                    _state.update { state ->
+                        state.copy(
+                            raceState = when (state.raceState) {
+                                State.RaceState.INITIAL -> {
+                                    raceRepository.startRace()
+                                    State.RaceState.STARTED
+                                }
+                                State.RaceState.STARTED -> {
+                                    raceRepository.endRace()
+                                    State.RaceState.STOPPED
+                                }
+                                State.RaceState.STOPPED -> State.RaceState.STOPPED
+                            }
+                        )
+                    }
+                }
             }
-        }
-    }
-
-    private inline fun updateState(
-        crossinline stateUpdater: (State) -> State
-    ) {
-        viewModelScope.launch {
-            _state.update { state -> stateUpdater(state) }
         }
     }
 
     data class State(
         val time: RaceTimeUi = RaceTimeUi.ZERO,
-        val isRaceInProgress: Boolean = false
-    )
+        val raceState: RaceState = RaceState.INITIAL
+    ) {
+        enum class RaceState { INITIAL, STARTED, STOPPED }
+    }
 
     sealed interface Event {
         data object OnStartClicked: Event

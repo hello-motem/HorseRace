@@ -25,4 +25,8 @@ class RaceRepositoryImpl @Inject constructor(
     override suspend fun endRace() {
         timer.stop()
     }
+
+    override suspend fun resetRace() {
+        timer.stopAndReset()
+    }
 }
