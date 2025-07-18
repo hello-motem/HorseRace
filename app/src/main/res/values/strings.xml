@@ -11,6 +11,8 @@
     <string name="race_time_title_text">Время первой лошади</string>
     <string name="empty_history_list_placeholder_text">У вас пока нет сохраненных гонок</string>
 
+    <string name="notification_title_text">Секундомер</string>
+
     <string-array name="tabs_array">
         <item>Гонка</item>
         <item>История</item>

@@ -1,4 +1,4 @@
-package com.hellomotem.horserace.delegates
+package com.hellomotem.horserace.utils.delegates
 
 import android.app.Activity
 import androidx.annotation.ArrayRes
