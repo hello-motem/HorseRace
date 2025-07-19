@@ -1,10 +1,12 @@
 package com.hellomotem.horserace.race.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hellomotem.horserace.history.data.model.RaceHistoryModel
 import com.hellomotem.horserace.history.data.repository.RaceHistoryRepository
 import com.hellomotem.horserace.race.data.repository.RaceRepository
+import com.hellomotem.horserace.race.data.repository.RaceStateModel
 import com.hellomotem.horserace.race.presentation.formatter.DateFormatter
 import com.hellomotem.horserace.race.presentation.models.RaceTimeUi
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,9 +28,22 @@ class RaceViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            raceRepository.raceTime.collect { time ->
+            raceRepository.raceState.collect { time ->
                 _state.update { state ->
-                    state.copy(time = RaceTimeUi.create(time.value))
+                    when (time) {
+                        is RaceStateModel.RaceEnded -> state.copy(
+                            raceState = State.RaceState.STOPPED,
+                            time = RaceTimeUi.create(time.raceTime.duration)
+                        )
+                        is RaceStateModel.RaceInProgress -> state.copy(
+                            time = RaceTimeUi.create(time.raceTime.duration),
+                            raceState = State.RaceState.STARTED
+                        )
+                        RaceStateModel.RaceNotStarted -> state.copy(
+                            raceState = State.RaceState.INITIAL,
+                            time = RaceTimeUi.ZERO
+                        )
+                    }
                 }
             }
         }
@@ -49,28 +64,17 @@ class RaceViewModel @Inject constructor(
     private suspend fun onRestartClicked(): Unit = _state.update { state ->
         raceRepository.resetRace()
 
-        state.copy(
-            raceState = State.RaceState.INITIAL,
-            isItemSaved = false
-        )
+        state.copy(isItemSaved = false)
     }
 
-    private suspend fun onStartClicked(): Unit = _state.update { state ->
-        state.copy(
-            raceState = when (state.raceState) {
-                State.RaceState.INITIAL -> {
-                    raceRepository.startRace()
-                    State.RaceState.STARTED
-                }
+    private suspend fun onStartClicked() {
+        when (state.value.raceState) {
+            State.RaceState.INITIAL -> raceRepository.startRace()
 
-                State.RaceState.STARTED -> {
-                    raceRepository.endRace()
-                    State.RaceState.STOPPED
-                }
+            State.RaceState.STARTED -> raceRepository.endRace()
 
-                State.RaceState.STOPPED -> State.RaceState.STOPPED
-            }
-        )
+            else -> Unit
+        }
     }
 
     private suspend fun onSaveClicked(): Unit = _state.update { state ->

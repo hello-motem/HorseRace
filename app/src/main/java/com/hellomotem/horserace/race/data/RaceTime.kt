@@ -3,7 +3,7 @@ package com.hellomotem.horserace.race.data
 import kotlin.time.Duration
 
 @JvmInline
-value class RaceTime private constructor(val value: Duration) {
+value class RaceTime private constructor(val duration: Duration) {
     companion object {
         fun create(duration: Duration): RaceTime = RaceTime(duration)
 

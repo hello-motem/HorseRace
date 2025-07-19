@@ -3,7 +3,7 @@ package com.hellomotem.horserace.race.data.repository
 import com.hellomotem.horserace.coroutines.CoroutineDispatchers
 import com.hellomotem.horserace.race.data.RaceStartDate
 import com.hellomotem.horserace.race.data.RaceTime
-import com.hellomotem.horserace.race.data.toRaceTime
+import com.hellomotem.horserace.race.data.toRaceStateModel
 import com.hellomotem.horserace.timer.Timer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,10 +16,14 @@ class RaceRepositoryImpl @Inject constructor(
     private val timer: Timer,
     dispatchers: CoroutineDispatchers
 ): RaceRepository {
-    override val raceTime: StateFlow<RaceTime> = timer
+    override val raceState: StateFlow<RaceStateModel> = timer
         .timerState
-        .map { timerState -> timerState.toRaceTime() }
-        .stateIn(CoroutineScope(dispatchers.default), SharingStarted.Eagerly, RaceTime.ZERO)
+        .map { timerState -> timerState.toRaceStateModel() }
+        .stateIn(
+            scope = CoroutineScope(dispatchers.default),
+            started = SharingStarted.Eagerly,
+            initialValue = RaceStateModel.RaceNotStarted
+        )
 
     override suspend fun startRace() {
         timer.start()

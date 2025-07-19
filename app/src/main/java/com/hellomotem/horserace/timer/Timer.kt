@@ -5,7 +5,7 @@ import java.time.Instant
 import kotlin.time.Duration
 
 interface Timer {
-    val timerState: Flow<State>
+    val timerState: Flow<TimerState>
 
     fun start()
 
@@ -15,13 +15,18 @@ interface Timer {
 
     fun getStartDate(): StartDate
 
-    @JvmInline
-    value class State(val value: Duration) {
 
-        companion object {
-            val ZERO = State(Duration.ZERO)
-        }
+    sealed interface TimerState {
+        data object TimerNotStarted: TimerState
+
+        @JvmInline
+        value class TimerStarted(val time: Time): TimerState
+
+        @JvmInline
+        value class TimerStopped(val time: Time): TimerState
     }
+    @JvmInline
+    value class Time(val value: Duration)
 
     @JvmInline
     value class StartDate(val value: Instant)

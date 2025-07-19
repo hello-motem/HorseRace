@@ -14,4 +14,4 @@ class DateFormatterImpl @Inject constructor(): DateFormatter {
         .format(instant)
 }
 
-private const val PATTERN = "HH:mm, dd.mm.yyyy"
+private const val PATTERN = "HH:mm, dd.MM.yyyy"
