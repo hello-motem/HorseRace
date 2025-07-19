@@ -1,10 +1,8 @@
 package com.hellomotem.horserace.race.notification
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -21,6 +19,8 @@ class AppLifecycleListener @Inject constructor(
     @ApplicationContext private val context: Context
 ): DefaultLifecycleObserver {
 
+    private val broadcastReceiver = RaceTimerBroadcastReceiver()
+
     private val isTimerRunning get() = raceRepository
         .raceState.value is RaceStateModel.RaceInProgress
 
@@ -33,6 +33,7 @@ class AppLifecycleListener @Inject constructor(
         if (isServiceRunning) {
             context.stopService(intent)
             isServiceRunning = false
+            context.unregisterReceiver(broadcastReceiver)
         }
     }
 
@@ -44,6 +45,14 @@ class AppLifecycleListener @Inject constructor(
             } else {
                 context.startService(intent)
             }
+
+            ContextCompat.registerReceiver(
+                context,
+                broadcastReceiver,
+                IntentFilter(STOP_TIMER_INTENT_ACTION_NAME),
+                RECEIVER_NOT_EXPORTED
+            )
+
             isServiceRunning = true
         }
     }

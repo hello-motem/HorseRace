@@ -24,7 +24,6 @@ import com.hellomotem.horserace.utils.buildinfo.isAtLeast34
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -51,8 +50,8 @@ class RaceTimerService: Service() {
     }
 
     private val stopTimerIntent by lazy(LazyThreadSafetyMode.NONE) {
-        val intent = Intent(this, RaceTimerBroadcastReceiver::class.java).apply {
-            action = STOP_TIMER_INTENT_ACTION_NAME
+        val intent = Intent(STOP_TIMER_INTENT_ACTION_NAME).apply {
+            setPackage(packageName)
         }
 
         PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
@@ -62,7 +61,6 @@ class RaceTimerService: Service() {
         RaceStateModelFormatter(this)
     }
 
-    @OptIn(FlowPreview::class)
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onCreate() {
         super.onCreate()
