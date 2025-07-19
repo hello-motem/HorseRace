@@ -1,12 +1,11 @@
 package com.hellomotem.horserace.race.data.repository
 
 import com.hellomotem.horserace.race.data.RaceStartDate
-import com.hellomotem.horserace.race.data.RaceTime
 import kotlinx.coroutines.flow.StateFlow
 
 interface RaceRepository {
 
-    val raceTime: StateFlow<RaceTime>
+    val raceState: StateFlow<RaceStateModel>
 
     suspend fun startRace()
 

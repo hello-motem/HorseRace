@@ -15,6 +15,9 @@ interface RaceHistoryDao {
     @Query("DELETE FROM race_history WHERE id = :id")
     suspend fun deleteRaceHistoryEntity(id: Long)
 
+    @Query("SELECT EXISTS (SELECT 1 FROM race_history WHERE id = :id)")
+    suspend fun isRaceHistoryEntitySaved(id: Long): Boolean
+
     @Insert
     suspend fun saveRaceHistoryEntity(raceHistoryEntity: RaceHistoryEntity)
 }

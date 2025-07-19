@@ -15,11 +15,9 @@ class RaceHistoryRepositoryImpl @Inject constructor(
         .getRaceHistory()
         .map { raceHistoryEntities -> raceHistoryEntities.toModel() }
 
-    override suspend fun saveRace(raceHistoryModel: RaceHistoryModel) {
-        localDataSource.saveRaceHistoryEntity(raceHistoryModel.toEntity())
-    }
+    override suspend fun saveRace(raceHistoryModel: RaceHistoryModel) = localDataSource
+        .saveRaceHistoryEntity(raceHistoryModel.toEntity())
 
-    override suspend fun deleteRaceHistoryItem(id: Long) {
-        localDataSource.deleteRaceHistoryEntity(id)
-    }
+    override suspend fun deleteRaceHistoryItem(id: Long) = localDataSource
+        .deleteRaceHistoryEntity(id)
 }
