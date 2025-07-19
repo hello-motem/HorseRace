@@ -1,7 +1,12 @@
 package com.hellomotem.horserace.race.notification
 
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.util.Log
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.hellomotem.horserace.race.data.repository.RaceRepository
@@ -10,10 +15,12 @@ import com.hellomotem.horserace.utils.buildinfo.isAtLeast26
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+
 class AppLifecycleListener @Inject constructor(
     private val raceRepository: RaceRepository,
     @ApplicationContext private val context: Context
 ): DefaultLifecycleObserver {
+
     private val isTimerRunning get() = raceRepository
         .raceState.value is RaceStateModel.RaceInProgress
 

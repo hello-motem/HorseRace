@@ -9,6 +9,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.hellomotem.horserace.race.data.repository.RaceRepository
 import com.hellomotem.horserace.race.data.repository.RaceStateModel
 import com.hellomotem.horserace.race.notification.AppLifecycleListener
+import com.hellomotem.horserace.race.notification.RaceTimerBroadcastReceiver
 import com.hellomotem.horserace.race.notification.RaceTimerService
 import com.hellomotem.horserace.utils.buildinfo.isAtLeast26
 import dagger.hilt.android.HiltAndroidApp

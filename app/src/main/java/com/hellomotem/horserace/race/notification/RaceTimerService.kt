@@ -15,8 +15,10 @@ import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import com.hellomotem.horserace.R
+import com.hellomotem.horserace.main.MainActivity
 import com.hellomotem.horserace.race.data.repository.RaceRepository
 import com.hellomotem.horserace.race.data.repository.RaceStateModel
+import com.hellomotem.horserace.utils.applyIf
 import com.hellomotem.horserace.utils.buildinfo.isAtLeast26
 import com.hellomotem.horserace.utils.buildinfo.isAtLeast34
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,8 +27,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,35 +38,58 @@ class RaceTimerService: Service() {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    private val openAppIntent by lazy(LazyThreadSafetyMode.NONE) {
+        PendingIntent.getActivity(
+            this,
+            0,
+            Intent(
+                this,
+                MainActivity::class.java
+            ),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
+    private val stopTimerIntent by lazy(LazyThreadSafetyMode.NONE) {
+        val intent = Intent(this, RaceTimerBroadcastReceiver::class.java).apply {
+            action = STOP_TIMER_INTENT_ACTION_NAME
+        }
+
+        PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private val raceStateModelFormatter by lazy(LazyThreadSafetyMode.NONE) {
+        RaceStateModelFormatter(this)
+    }
+
     @OptIn(FlowPreview::class)
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     override fun onCreate() {
         super.onCreate()
-        createNotificationChannel()
 
-        if (isAtLeast34) {
-            ServiceCompat.startForeground(
-                this,
-                1,
-                newNotification(),
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-            )
-        } else {
-            startForeground(1, newNotification())
-        }
         coroutineScope.launch {
             raceRepository.raceState
-                .filterIsInstance<RaceStateModel.RaceInProgress>()
                 .distinctUntilChanged { old, new ->
                     if (old is RaceStateModel.RaceInProgress
                         && new is RaceStateModel.RaceInProgress) {
                         old.raceTime.duration.inWholeSeconds == new.raceTime.duration.inWholeSeconds
                     } else false
                 }
-//                .map { it.toNotification().toString() }
-                .map { it.toString() }
                 .collect { updateNotification(it) }
         }
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        createNotificationChannel()
+
+        ServiceCompat.startForeground(
+            this,
+            NOTIFICATION_ID,
+            newNotification(),
+            if (isAtLeast34) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
+        )
+
+        return START_STICKY
     }
 
     override fun onDestroy() {
@@ -76,41 +99,40 @@ class RaceTimerService: Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    private fun newNotification(text: String = ""): Notification {
-        val ACTION_SNOOZE = "snooze"
-
-        val snoozeIntent = Intent(this, RaceTimerBroadcastReceiver::class.java).apply {
-            action = ACTION_SNOOZE
-            putExtra("EXTRA_NOTIFICATION_ID", 0)
-        }
-
-        val snoozePendingIntent: PendingIntent =
-            PendingIntent.getBroadcast(this, 0, snoozeIntent, PendingIntent.FLAG_IMMUTABLE)
-
+    private fun newNotification(
+        text: String = raceStateModelFormatter.emptyPlaceholder(),
+        isStopButtonVisible: Boolean = true
+    ): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle(getString(R.string.notification_title_text))
             .setContentText(text)
             .setVisibility(VISIBILITY_PUBLIC)
             .setSilent(true)
+            .setAutoCancel(true)
+            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .addAction(
+            .applyIf(isStopButtonVisible) {
+                addAction(
                 R.drawable.ic_launcher_foreground,
                 getString(R.string.stop_button_text),
-                snoozePendingIntent
-            )
-            .addAction(
-                R.drawable.ic_launcher_foreground,
-                getString(R.string.restart_button_text),
-                snoozePendingIntent
-            )
+                    stopTimerIntent
+                )
+            }
+            .setContentIntent(openAppIntent)
             .build()
     }
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
-    private fun updateNotification(text: String) {
+    private fun updateNotification(raceStateModel: RaceStateModel) {
         with(NotificationManagerCompat.from(this))  {
-            notify(NOTIFICATION_ID, newNotification(text))
+            notify(
+                NOTIFICATION_ID,
+                newNotification(
+                    text = raceStateModelFormatter.format(raceStateModel),
+                    isStopButtonVisible = raceStateModel is RaceStateModel.RaceInProgress
+                )
+            )
         }
     }
 
@@ -132,4 +154,4 @@ class RaceTimerService: Service() {
 }
 
 private const val NOTIFICATION_ID = 1
-private const val CHANNEL_ID = "timer_channel"
+private const val CHANNEL_ID = "timer_notification_channel"

@@ -13,6 +13,10 @@
 
     <string name="notification_title_text">Секундомер</string>
     <string name="notification_channel_description">Уведомления секундомера</string>
+    <string name="notification_format_days">Дни: </string>
+    <string name="notification_format_hours">Часы: </string>
+    <string name="notification_format_minutes">Минуты: </string>
+    <string name="notification_format_seconds">Секунды: </string>
 
     <string-array name="tabs_array">
         <item>Гонка</item>

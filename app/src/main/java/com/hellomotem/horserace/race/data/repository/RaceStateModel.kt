@@ -11,3 +11,9 @@ sealed interface RaceStateModel {
     @JvmInline
     value class RaceEnded(val raceTime: RaceTime): RaceStateModel
 }
+
+val RaceStateModel.timeOrDefault: RaceTime get() = when(this) {
+    is RaceStateModel.RaceEnded -> raceTime
+    is RaceStateModel.RaceInProgress -> raceTime
+    RaceStateModel.RaceNotStarted -> RaceTime.ZERO
+}

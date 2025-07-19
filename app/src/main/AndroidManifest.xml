@@ -37,7 +37,7 @@
             android:name=".race.notification.RaceTimerBroadcastReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="race stopped"/>
+                <action android:name="com.hellomotem.horserace.STOP_TIMER"/>
             </intent-filter>
         </receiver>
 
