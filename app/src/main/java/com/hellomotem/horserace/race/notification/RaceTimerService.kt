@@ -9,34 +9,26 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.asLiveData
 import com.hellomotem.horserace.R
 import com.hellomotem.horserace.race.data.repository.RaceRepository
+import com.hellomotem.horserace.race.data.repository.RaceStateModel
 import com.hellomotem.horserace.utils.buildinfo.isAtLeast26
 import com.hellomotem.horserace.utils.buildinfo.isAtLeast34
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 @AndroidEntryPoint
 class RaceTimerService: Service() {
@@ -63,11 +55,16 @@ class RaceTimerService: Service() {
             startForeground(1, newNotification())
         }
         coroutineScope.launch {
-            raceRepository.raceTime
+            raceRepository.raceState
+                .filterIsInstance<RaceStateModel.RaceInProgress>()
                 .distinctUntilChanged { old, new ->
-                    old.value.inWholeSeconds == new.value.inWholeSeconds
+                    if (old is RaceStateModel.RaceInProgress
+                        && new is RaceStateModel.RaceInProgress) {
+                        old.raceTime.duration.inWholeSeconds == new.raceTime.duration.inWholeSeconds
+                    } else false
                 }
-                .map { it.toNotification().toString() }
+//                .map { it.toNotification().toString() }
+                .map { it.toString() }
                 .collect { updateNotification(it) }
         }
     }
@@ -112,20 +109,19 @@ class RaceTimerService: Service() {
 
     @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     private fun updateNotification(text: String) {
-        Log.d("Some_tag", "update notification called with $text")
         with(NotificationManagerCompat.from(this))  {
-            // notificationId is a unique int for each notification that you must define.
             notify(NOTIFICATION_ID, newNotification(text))
         }
     }
 
     private fun createNotificationChannel() {
         if (isAtLeast26) {
-            val name = CHANNEL_ID//getString(R.string.channel_name)
-            val descriptionText = "Sample description"//getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.notification_title_text),
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = getString(R.string.notification_channel_description)
             }
             // Register the channel with the system.
             val notificationManager: NotificationManager =

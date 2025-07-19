@@ -70,4 +70,6 @@ dependencies {
 
     //Desugaring
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    implementation(libs.androidx.lifecycle.process)
 }

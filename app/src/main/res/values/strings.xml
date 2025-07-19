@@ -12,6 +12,7 @@
     <string name="empty_history_list_placeholder_text">У вас пока нет сохраненных гонок</string>
 
     <string name="notification_title_text">Секундомер</string>
+    <string name="notification_channel_description">Уведомления секундомера</string>
 
     <string-array name="tabs_array">
         <item>Гонка</item>

@@ -40,7 +40,8 @@ class RaceViewModel @Inject constructor(
                             raceState = State.RaceState.STARTED
                         )
                         RaceStateModel.RaceNotStarted -> state.copy(
-                            raceState = State.RaceState.INITIAL
+                            raceState = State.RaceState.INITIAL,
+                            time = RaceTimeUi.ZERO
                         )
                     }
                 }

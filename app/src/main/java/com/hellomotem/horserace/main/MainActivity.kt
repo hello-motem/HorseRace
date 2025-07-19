@@ -50,8 +50,6 @@ class MainActivity : AppCompatActivity() {
         setupUi()
 
         requestPermissions()
-
-        startForegroundService(Intent(this, RaceTimerService::class.java))
     }
 
     private fun setupUi() {
